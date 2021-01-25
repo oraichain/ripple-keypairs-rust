@@ -1,0 +1,20 @@
+[package]
+name = "ripple-keypairs"
+version = "0.1.0"
+authors = ["Stanislav Otovchits <otov4its@gmail.com>"]
+description = "Cryptographic key pairs for the XRP Ledger"
+license = "ISC"
+repository = "https://github.com/otov4its/ripple-keypairs-rust/"
+readme = "README.md"
+keywords = ["ripple", "keypair", "xrp", "cryptocurrencies", "encoding"]
+categories = ["cryptography::cryptocurrencies", "encoding"]
+edition = "2018"
+
+[dependencies]
+ripple-address-codec = { version = "0.1.0", path = "../ripple-address-codec" }
+ring = "0.16.19"
+base-x = "0.2.8"
+hex = "0.4.2"
+num-bigint = "0.3.1"
+libsecp256k1 = "0.3.5"
+ripemd160 = "0.9.1"
