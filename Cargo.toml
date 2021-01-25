@@ -11,7 +11,7 @@ categories = ["cryptography::cryptocurrencies", "encoding"]
 edition = "2018"
 
 [dependencies]
-ripple-address-codec = { version = "0.1.0", path = "../ripple-address-codec" }
+ripple-address-codec = "0.1.1"
 ring = "0.16.19"
 base-x = "0.2.8"
 hex = "0.4.2"
