@@ -59,8 +59,8 @@
     missing_debug_implementations,
     missing_copy_implementations,
     missing_docs,
-    missing_crate_level_docs,
-    missing_doc_code_examples,
+    rustdoc::missing_crate_level_docs,
+    rustdoc::missing_doc_code_examples,
     non_ascii_idents,
     unreachable_pub
 )]
