@@ -4,7 +4,7 @@ use ring::digest;
 
 use num_bigint::{BigInt, Sign as BigIntSign};
 
-use ::secp256k1::{
+use libsecp256k1::{
     sign, verify, Message, PublicKey as SecPublicKey, SecretKey as SecPrivateKey,
     Signature as SecSignature,
 };

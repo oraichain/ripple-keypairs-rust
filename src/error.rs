@@ -48,4 +48,4 @@ macro_rules! impl_from_error {
 }
 
 impl_from_error!(base_x::DecodeError => DecodeError);
-impl_from_error!(secp256k1::Error => InvalidSignature);
+impl_from_error!(libsecp256k1::Error => InvalidSignature);
