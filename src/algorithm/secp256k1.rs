@@ -1,6 +1,6 @@
 use std::convert::TryInto;
 
-use ring::digest;
+use sha2::{Sha512, Digest};
 
 use num_bigint::{BigInt, Sign as BigIntSign};
 
@@ -127,8 +127,8 @@ impl SeedEcDsaSecP256K1 {
     fn derive_scalar(bytes: &[u8], discrim: Option<u32>) -> BigInt {
         let order = Self::order_n();
 
-        for i in 0..=0xffffffff as u32 {
-            let mut hasher = digest::Context::new(&digest::SHA512);
+        for i in 0..=0xffffffffu32 {
+            let mut hasher = Sha512::new();
 
             hasher.update(bytes);
 
@@ -140,7 +140,7 @@ impl SeedEcDsaSecP256K1 {
 
             let key = BigInt::from_bytes_be(
                 BigIntSign::Plus,
-                &hasher.finish().as_ref()[..PrivateKeyEcDsaSecP256K1::LENGHT],
+                &hasher.finalize().iter().as_slice()[..PrivateKeyEcDsaSecP256K1::LENGHT],
             );
 
             if key > 0.into() && key < order {

@@ -1,11 +1,13 @@
-use ring::signature::{self, KeyPair};
+use std::convert::TryFrom;
+use ed25519_dalek::{SigningKey, VerifyingKey, Signature, Signer, SecretKey, Verifier};
 
 use ripple_address_codec as codec;
 
 use crate::{
-    error::{DeriveKeyPairError, InvalidSignature, Result},
+    error::{InvalidSignature, Result},
     utils, Ed25519, EntropyArray, HexBytes, KeyPairResult, PrivateKey, PublicKey,
 };
+use crate::error::DeriveKeyPairError;
 
 use super::{Key, Seed, Sign, Verify};
 
@@ -14,9 +16,8 @@ pub(crate) struct PrivateKeyEd25519;
 
 impl Sign for PrivateKeyEd25519 {
     fn sign(&self, message: &[u8], private_key: &[u8]) -> HexBytes {
-        let key_pair = signature::Ed25519KeyPair::from_seed_unchecked(private_key).unwrap();
-
-        HexBytes::from_bytes(&key_pair.sign(message))
+        let private_key = SecretKey::try_from(private_key).unwrap();
+        HexBytes::from_bytes(&SigningKey::from_bytes(&private_key).sign(message).to_vec())
     }
 }
 
@@ -40,11 +41,9 @@ pub(crate) struct PublicKeyEd25519;
 
 impl Verify for PublicKeyEd25519 {
     fn verify(&self, message: &[u8], signature: &[u8], public_key: &[u8]) -> Result<()> {
-        let public_key = signature::UnparsedPublicKey::new(&signature::ED25519, public_key);
-
-        public_key
-            .verify(message, signature)
-            .map_err(|_| InvalidSignature)
+        let signature = Signature::try_from(signature).map_err(|_| InvalidSignature)?;
+        let verifying_key = VerifyingKey::try_from(public_key).map_err(|_| InvalidSignature)?;
+        verifying_key.verify(message, &signature).map_err(|_| InvalidSignature)
     }
 }
 
@@ -70,10 +69,8 @@ impl Seed for SeedEd25519 {
     fn derive_keypair(&self, entropy: &EntropyArray) -> KeyPairResult {
         let raw_priv = utils::sha512_digest_32(entropy);
 
-        let key_pair = signature::Ed25519KeyPair::from_seed_unchecked(&raw_priv)
-            .map_err(|_| DeriveKeyPairError)?;
-
-        let raw_pub = key_pair.public_key().as_ref().to_vec();
+        let private_key = SigningKey::try_from(raw_priv.as_slice()).map_err(|_| DeriveKeyPairError)?;
+        let raw_pub = private_key.verifying_key().as_bytes().to_vec();
 
         let kind = &Ed25519;
 

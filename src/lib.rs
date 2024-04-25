@@ -60,7 +60,6 @@
     missing_copy_implementations,
     missing_docs,
     rustdoc::missing_crate_level_docs,
-    rustdoc::missing_doc_code_examples,
     non_ascii_idents,
     unreachable_pub
 )]
@@ -69,7 +68,7 @@
 
 use std::{convert::TryInto, fmt, str::FromStr};
 
-use ring::rand::{SecureRandom, SystemRandom};
+use getrandom::getrandom;
 
 mod utils;
 
@@ -146,8 +145,7 @@ impl Seed {
             Random => {
                 let mut entropy: EntropyArray = [0; 16];
 
-                SystemRandom::new()
-                    .fill(&mut entropy)
+                getrandom(&mut entropy)
                     .expect("unspecified random geterator error");
 
                 entropy
