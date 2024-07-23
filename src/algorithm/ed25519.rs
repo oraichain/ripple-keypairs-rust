@@ -61,7 +61,7 @@ impl Key for PublicKeyEd25519 {
 
 impl PublicKeyEd25519 {
     const LENGHT: usize = 32;
-    const PREFIX: &'static [u8] = &[0xED];
+    pub(crate) const PREFIX: &'static [u8] = &[0xED];
 }
 
 #[derive(Debug)]

@@ -79,7 +79,7 @@ impl Key for PublicKeyEcDsaSecP256K1 {
 
 impl PublicKeyEcDsaSecP256K1 {
     const LENGHT: usize = 33;
-    const PREFIX: &'static [u8] = &[];
+    pub(crate) const PREFIX: &'static [u8] = &[];
 }
 
 #[derive(Debug)]

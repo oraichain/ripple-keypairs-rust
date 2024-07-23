@@ -145,8 +145,7 @@ impl Seed {
             Random => {
                 let mut entropy: EntropyArray = [0; 16];
 
-                getrandom(&mut entropy)
-                    .expect("unspecified random geterator error");
+                getrandom(&mut entropy).expect("unspecified random geterator error");
 
                 entropy
             }
@@ -430,4 +429,38 @@ impl fmt::Display for PublicKey {
                 .encode_to_hex(&self.method().as_bytes(&self.bytes))
         )
     }
+}
+
+impl FromStr for PublicKey {
+    type Err = error::Error;
+
+    fn from_str(s: &str) -> error::Result<Self> {
+        // HexBytes::from_bytes(&[self.prefix(), bytes].concat()).to_string()
+
+        let hex_bytes = HexBytes::from_hex(s)
+            .map_err(|_| error::DecodeError)?
+            .as_bytes()
+            .to_vec();
+
+        let (kind, bytes) = match &hex_bytes[0..1] {
+            alg::ed25519::PublicKeyEd25519::PREFIX => {
+                (&Algorithm::Ed25519, hex_bytes[1..].to_vec())
+            }
+            // Secp256k1 has first byte = 2 | 3
+            _ => (&Algorithm::Secp256k1, hex_bytes),
+        };
+
+        Ok(Self { bytes, kind })
+    }
+}
+
+#[test]
+fn test_serialize() {
+    let seed = Seed::new(Random, &Secp256k1);
+    let (_, public_key) = seed.derive_keypair().unwrap();
+    let str = public_key.to_string();
+    let public_key_decoded = PublicKey::from_str(&str).unwrap();
+
+    println!("{:?}", public_key_decoded);
+    assert_eq!(public_key, public_key_decoded);
 }
