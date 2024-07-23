@@ -1,13 +1,13 @@
+use ed25519_dalek::{SecretKey, Signature, Signer, SigningKey, Verifier, VerifyingKey};
 use std::convert::TryFrom;
-use ed25519_dalek::{SigningKey, VerifyingKey, Signature, Signer, SecretKey, Verifier};
 
 use ripple_address_codec as codec;
 
+use crate::error::DeriveKeyPairError;
 use crate::{
     error::{InvalidSignature, Result},
     utils, Ed25519, EntropyArray, HexBytes, KeyPairResult, PrivateKey, PublicKey,
 };
-use crate::error::DeriveKeyPairError;
 
 use super::{Key, Seed, Sign, Verify};
 
@@ -22,7 +22,7 @@ impl Sign for PrivateKeyEd25519 {
 }
 
 impl Key for PrivateKeyEd25519 {
-    fn key_lenght(&self) -> usize {
+    fn key_length(&self) -> usize {
         Self::LENGHT
     }
 
@@ -43,12 +43,14 @@ impl Verify for PublicKeyEd25519 {
     fn verify(&self, message: &[u8], signature: &[u8], public_key: &[u8]) -> Result<()> {
         let signature = Signature::try_from(signature).map_err(|_| InvalidSignature)?;
         let verifying_key = VerifyingKey::try_from(public_key).map_err(|_| InvalidSignature)?;
-        verifying_key.verify(message, &signature).map_err(|_| InvalidSignature)
+        verifying_key
+            .verify(message, &signature)
+            .map_err(|_| InvalidSignature)
     }
 }
 
 impl Key for PublicKeyEd25519 {
-    fn key_lenght(&self) -> usize {
+    fn key_length(&self) -> usize {
         Self::LENGHT
     }
 
@@ -69,7 +71,8 @@ impl Seed for SeedEd25519 {
     fn derive_keypair(&self, entropy: &EntropyArray) -> KeyPairResult {
         let raw_priv = utils::sha512_digest_32(entropy);
 
-        let private_key = SigningKey::try_from(raw_priv.as_slice()).map_err(|_| DeriveKeyPairError)?;
+        let private_key =
+            SigningKey::try_from(raw_priv.as_slice()).map_err(|_| DeriveKeyPairError)?;
         let raw_pub = private_key.verifying_key().as_bytes().to_vec();
 
         let kind = &Ed25519;

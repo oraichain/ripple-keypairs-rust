@@ -1,6 +1,6 @@
 use std::convert::TryInto;
 
-use sha2::{Sha512, Digest};
+use sha2::{Digest, Sha512};
 
 use num_bigint::{BigInt, Sign as BigIntSign};
 
@@ -35,7 +35,7 @@ impl Sign for PrivateKeyEcDsaSecP256K1 {
 }
 
 impl Key for PrivateKeyEcDsaSecP256K1 {
-    fn key_lenght(&self) -> usize {
+    fn key_length(&self) -> usize {
         Self::LENGHT
     }
 
@@ -68,7 +68,7 @@ impl Verify for PublicKeyEcDsaSecP256K1 {
 }
 
 impl Key for PublicKeyEcDsaSecP256K1 {
-    fn key_lenght(&self) -> usize {
+    fn key_length(&self) -> usize {
         Self::LENGHT
     }
 
